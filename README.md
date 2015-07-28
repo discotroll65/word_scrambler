@@ -1,2 +1,2 @@
 # word_scrambler
-fun word scrambler to unscramble anagrams
+fun word scrambler to unscramble anagrams 
