@@ -1,0 +1,37 @@
+// Place all the styles related to the static_pages controller here.
+// They will automatically be included in application.css.
+// You can use Sass (SCSS) here: http://sass-lang.com/
+#app {
+  height: 100%;
+  width: 100%;
+  background: #f2d31d;
+  color: #dbbb09;
+}
+body, html {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+
+.group:after{
+  clear: both;
+  content: "";
+  display: block;
+}
+
+.word-scrambler{
+  position: relative;
+  top: 35%;
+  margin: auto;
+  text-align: center;
+  width: 90%;
+}
+
+.letter-block{
+  display: inline-block;
+  width: 100px;
+  height: 100px;
+  margin: 0 20px;
+  text-align: center;
+  background: #FEE970;
+}
