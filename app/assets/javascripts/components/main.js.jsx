@@ -1,4 +1,4 @@
-var api = "http://api.wordnik.com/v4/words.json/randomWord?";
+var api = "https://api.wordnik.com/v4/words.json/randomWord?";
 api += "hasDictionaryDef=true";
 api += "&minCorpusCount=80000";
 api += "&maxCorpusCount=90000";
