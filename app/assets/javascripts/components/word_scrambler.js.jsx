@@ -28,14 +28,16 @@ class WordScrambler extends React.Component{
       <div className="group word-scrambler" >
         {letters.map(function(letter, idx){
           if(that.props.currentIdx > idx){
-            return <LetterBlock highlighted={true} key={idx} ltr={letter}/>;
+            return <LetterBlock highlighted={true}
+              key={idx} checked={that.props.checked} ltr={letter}/>;
           } else {
-            return <LetterBlock key={idx} ltr={letter}/>;
+            return <LetterBlock key={idx}
+              checked={that.props.checked} ltr={letter}/>;
           }
 
         })}
       </div>
-    )
+    );
   }
 }
 
@@ -55,6 +57,7 @@ var response = $.ajax(api, {
     letters = response.responseJSON.word.split('').map(function(letter){
       return letter.toUpperCase();
     });
+
     shuffledLtrs = (function(arr){
       var currentIndex = arr.length, tempVal, randIndex;
 
@@ -68,7 +71,9 @@ var response = $.ajax(api, {
       }
       return arr;
     })(letters.slice());
+
     currentShuffLtrs = shuffledLtrs.slice();
+
     React.render(<WordScrambler currentIdx={currentIdx}
       shuffLtrs={shuffledLtrs} ltrs={letters}/>, $('#app')[0]);
   }
@@ -94,16 +99,29 @@ $(function(){
   $(document).keyup(function(event){
     event.preventDefault();
     if(event.keyCode === 8){
+      //decrement the highlighting if you push backspace
       currentIdx -= 1;
       React.render(<WordScrambler currentIdx={currentIdx}
         shuffLtrs={currentShuffLtrs} ltrs={letters}/>, $('#app')[0]);
     } else if(event.keyCode >= 65 && event.keyCode <= 90){
+      //advance letter highlighting if there's a match
       var letter = String.fromCharCode(event.keyCode);
       var results = handleLetterInput(letter, currentIdx, currentShuffLtrs);
       currentShuffLtrs = results.currentShuffLtrs;
       currentIdx = results.currentIdx;
-      React.render(<WordScrambler currentIdx={currentIdx}
-        shuffLtrs={currentShuffLtrs} ltrs={letters}/>, $('#app')[0]);
+
+      if(currentIdx === letters.length){
+        var checked = (currentShuffLtrs.join('') === letters.join('')) ?
+          "won" : "lost";
+
+        React.render(<WordScrambler currentIdx={currentIdx}
+          shuffLtrs={currentShuffLtrs} checked={checked}
+          ltrs={letters}/>, $('#app')[0]);
+
+      } else{
+        React.render(<WordScrambler currentIdx={currentIdx}
+          shuffLtrs={currentShuffLtrs} ltrs={letters}/>, $('#app')[0]);
+      }
     }
 
     console.log(letters);

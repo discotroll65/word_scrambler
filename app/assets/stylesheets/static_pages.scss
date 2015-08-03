@@ -39,3 +39,13 @@ body, html {
 .highlighted.letter-block{
   background: white;
 }
+
+.highlighted.letter-block.won{
+  background: green;
+  color: white;
+}
+
+.highlighted.letter-block.lost{
+  background: red;
+  color: white;
+}
