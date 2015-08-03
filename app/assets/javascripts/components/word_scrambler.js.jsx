@@ -94,7 +94,9 @@ $(function(){
   $(document).keyup(function(event){
     event.preventDefault();
     if(event.keyCode === 8){
-      console.log("backspace")
+      currentIdx -= 1;
+      React.render(<WordScrambler currentIdx={currentIdx}
+        shuffLtrs={currentShuffLtrs} ltrs={letters}/>, $('#app')[0]);
     } else if(event.keyCode >= 65 && event.keyCode <= 90){
       var letter = String.fromCharCode(event.keyCode);
       var results = handleLetterInput(letter, currentIdx, currentShuffLtrs);
