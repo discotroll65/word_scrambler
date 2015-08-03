@@ -1,25 +1,4 @@
 class WordScrambler extends React.Component{
-  // constructor() {
-  //   super();
-  //
-  //   this.state = {
-  //     ltrIdx: 0,
-  //     ltrs: [],
-  //     shuffLtrs: []
-  //   };
-  //
-  //   this._handleKeyUp = this._handleKeyUp.bind(this);
-  // }
-  //
-  // _handleKeyUp(event){
-  //   debugger
-  //   if (event.keyCode === 8){
-  //     console.log('backspace');
-  //   } else{
-  //     console.log(String.fromCharCode(event.keyCode));
-  //   }
-  // }
-
   render(){
     console.log('word is: ' + this.props.ltrs);
     let letters = this.props.shuffLtrs;
@@ -51,26 +30,28 @@ api += "&api_key=a2a73e7b926c924fad7001ca3111acd55af2ffabf50eb4ae5"
 
 var currentIdx = 0, shuffledLtrs, letters, currentShuffLtrs;
 
-var response = $.ajax(api, {
+var shuffle = function(arr){
+  var currentIndex = arr.length, tempVal, randIndex;
+
+  while(currentIndex > 0){
+    randIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex -= 1;
+
+    tempVal = arr[currentIndex];
+    arr[currentIndex] = arr[randIndex];
+    arr[randIndex] = tempVal;
+  }
+  return arr;
+};
+
+var getNewWord = $.ajax.bind(this, api, {
   dataType: "json",
-  success: function(){
-    letters = response.responseJSON.word.split('').map(function(letter){
+  success: function(apiResponse){
+    letters = apiResponse.word.split('').map(function(letter){
       return letter.toUpperCase();
     });
 
-    shuffledLtrs = (function(arr){
-      var currentIndex = arr.length, tempVal, randIndex;
-
-      while(currentIndex > 0){
-        randIndex = Math.floor(Math.random() * currentIndex);
-        currentIndex -= 1;
-
-        tempVal = arr[currentIndex];
-        arr[currentIndex] = arr[randIndex];
-        arr[randIndex] = tempVal;
-      }
-      return arr;
-    })(letters.slice());
+    shuffledLtrs = shuffle(letters.slice());
 
     currentShuffLtrs = shuffledLtrs.slice();
 
@@ -78,6 +59,7 @@ var response = $.ajax(api, {
       shuffLtrs={shuffledLtrs} ltrs={letters}/>, $('#app')[0]);
   }
 });
+getNewWord();
 
 var handleLetterInput = function(letter, currentIndex, currentShuffLtrs){
   var remainingArr = currentShuffLtrs.slice(currentIndex, currentShuffLtrs.length);
@@ -91,6 +73,31 @@ var handleLetterInput = function(letter, currentIndex, currentShuffLtrs){
   return {currentShuffLtrs: currentShuffLtrs, currentIdx: (currentIndex)}
 };
 
+// var handleWordEval = function(currentIdx, currentShuffLtrs, checked){
+
+var handleWordEval = function(){
+  var checked = (currentShuffLtrs.join('') === letters.join('')) ?
+    "won" : "lost";
+
+  if(checked === "won"){
+    React.render(<WordScrambler currentIdx={currentIdx}
+      shuffLtrs={currentShuffLtrs} checked={checked}
+      ltrs={letters}/>, $('#app')[0]);
+    currentIdx = 0;
+    setTimeout(getNewWord, 1000);
+  } else{
+    React.render(<WordScrambler currentIdx={currentIdx}
+      shuffLtrs={currentShuffLtrs} checked={checked}
+      ltrs={letters}/>, $('#app')[0]);
+    setTimeout(function(){
+      currentIdx = 0;
+      React.render(<WordScrambler currentIdx={currentIdx}
+        shuffLtrs={shuffledLtrs} ltrs={letters}/>, $('#app')[0]);
+    }, 1000);
+  }
+
+}
+
 $(function(){
   $(document).keydown(function(event){
     event.preventDefault();
@@ -100,7 +107,7 @@ $(function(){
     event.preventDefault();
     if(event.keyCode === 8){
       //decrement the highlighting if you push backspace
-      currentIdx -= 1;
+      currentIdx = (currentIdx === 0) ? 0 : (currentIdx - 1) ;
       React.render(<WordScrambler currentIdx={currentIdx}
         shuffLtrs={currentShuffLtrs} ltrs={letters}/>, $('#app')[0]);
     } else if(event.keyCode >= 65 && event.keyCode <= 90){
@@ -110,14 +117,9 @@ $(function(){
       currentShuffLtrs = results.currentShuffLtrs;
       currentIdx = results.currentIdx;
 
+      //either handle a word eval or render normally
       if(currentIdx === letters.length){
-        var checked = (currentShuffLtrs.join('') === letters.join('')) ?
-          "won" : "lost";
-
-        React.render(<WordScrambler currentIdx={currentIdx}
-          shuffLtrs={currentShuffLtrs} checked={checked}
-          ltrs={letters}/>, $('#app')[0]);
-
+        handleWordEval();
       } else{
         React.render(<WordScrambler currentIdx={currentIdx}
           shuffLtrs={currentShuffLtrs} ltrs={letters}/>, $('#app')[0]);
